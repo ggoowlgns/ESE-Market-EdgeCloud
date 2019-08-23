@@ -6,7 +6,7 @@ import paho.mqtt.publish as publish
 priority = {"face_recognition" : 3, "object_detection" : 2, "qr_code" : 1}
 HighResolution = [] # 요구 해상도로 올려져 있을 경우 해당 카메라가 추가되는 리스트
 Maxcount = 0
-MaxBandwidth = 100
+MaxBandwidth = 45
 total = 0
 threadstate = False
 
