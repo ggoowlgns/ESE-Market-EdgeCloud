@@ -11,7 +11,7 @@ total = 0
 threadstate = False
 
 # fps를 낮춰주는 스레드
-def lowerfps_thread():
+def controll_fps_thread():
     global threadstate, Maxcount, MaxBandwidth
     index = 0
     while threadstate:
@@ -68,7 +68,7 @@ if __name__ == "__main__":
                 HighResolution[y] = templist[y]
             Maxcount = len(HighResolution)
             threadstate = True
-            t1 = Thread(target=lowerfps_thread)
+            t1 = Thread(target=controll_fps_thread())
             t1.start()
 
 # 수용 대역폭이 한정 대역폭을 초과 하였을때

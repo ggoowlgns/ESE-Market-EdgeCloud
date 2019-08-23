@@ -16,7 +16,8 @@ class UpdateBandwidth:
         while size > power:
             size /= power
             n += 1
-        return size, power_labels[n]+'bytes'
+
+        return size/8, power_labels[n]+'bytes'
 
     def update_page(self):
         webPage_xml = urllib.request.urlopen("http://61.253.199.32:81/stat.xml")
