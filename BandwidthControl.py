@@ -2,6 +2,8 @@ from threading import Thread
 import time
 import update_bandwidth
 import paho.mqtt.publish as publish
+import urllib.request
+
 
 priority = {"face_recognition" : 3, "object_detection" : 2, "qr_code" : 1}
 HighResolution = [] # 요구 해상도로 올려져 있을 경우 해당 카메라가 추가되는 리스트
@@ -73,6 +75,10 @@ if __name__ == "__main__":
                 t1.start()
         except AttributeError:
             print("Loading 중 입니다.")
+        except TimeoutError:
+            print("연결이 끊겼습니다. 잠시만 기다려주세요")
+        except urllib.error.URLError:
+            print("연결이 끊겼습니다. 잠시만 기다려주세요22")
 # 수용 대역폭이 한정 대역폭을 초과 하였을때
 
 
