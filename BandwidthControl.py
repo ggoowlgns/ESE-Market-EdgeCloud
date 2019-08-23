@@ -41,36 +41,38 @@ def controll_fps_thread():
 
 if __name__ == "__main__":
     while True:
-        UB = update_bandwidth.UpdateBandwidth()
-        UB.update_page()
-        in_bw, stream_meta = UB.get_data()
-        total = in_bw[0]
-        for camera in stream_meta.keys():
-            if stream_meta[camera][0] == '160':
-                if priority[camera] in HighResolution:
-                    msgs = \
-                        [
-                            {
-                                'topic': camera,
-                                'payload': "reset"
-                            }
-                        ]
-                    publish.multiple(msgs, hostname="61.253.199.32")
-                    HighResolution.remove(camera)
-            else:
-                HighResolution.append(camera)
-        if MaxBandwidth < total and not threadstate:
-            templist = []
-            for x in priority.keys():
-                if x in HighResolution:
-                    templist.append(x)
-            for y in len(templist):
-                HighResolution[y] = templist[y]
-            Maxcount = len(HighResolution)
-            threadstate = True
-            t1 = Thread(target=controll_fps_thread())
-            t1.start()
-
+        try:
+            UB = update_bandwidth.UpdateBandwidth()
+            UB.update_page()
+            in_bw, stream_meta = UB.get_data()
+            total = in_bw[0]
+            for camera in stream_meta.keys():
+                if stream_meta[camera][0] == '160':
+                    if priority[camera] in HighResolution:
+                        msgs = \
+                            [
+                                {
+                                    'topic': camera,
+                                    'payload': "reset"
+                                }
+                            ]
+                        publish.multiple(msgs, hostname="61.253.199.32")
+                        HighResolution.remove(camera)
+                else:
+                    HighResolution.append(camera)
+            if MaxBandwidth < total and not threadstate:
+                templist = []
+                for x in priority.keys():
+                    if x in HighResolution:
+                        templist.append(x)
+                for y in len(templist):
+                    HighResolution[y] = templist[y]
+                Maxcount = len(HighResolution)
+                threadstate = True
+                t1 = Thread(target=controll_fps_thread())
+                t1.start()
+        except AttributeError:
+            print("Loading 중 입니다.")
 # 수용 대역폭이 한정 대역폭을 초과 하였을때
 
 
