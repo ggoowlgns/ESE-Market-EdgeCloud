@@ -5,16 +5,18 @@ import paho.mqtt.publish as publish
 import urllib.request
 import paho.mqtt.client as mqtt
 
-priority = {"face_recognition": 3, "object_detection": 2, "qr_code": 1}
+priority = {"face_recognition": 3, "object_detection": 2, "qr_code": 1, "face_recognition2" : 4, "qr_code2" : 5}
 HighResolution = []  # 요구 해상도로 올려져 있을 경우 해당 카메라가 추가되는 리스트
 Maxcount = 0
-MaxBandwidth = 100
+MaxBandwidth = 190
 total = 0
 threadstate = False
 
 Objectstate = False
 Facestate = False
 QRstate = False
+Facestate2 = False
+QRstate2 = False
 
 total_prev = 0
 error_occured = False
@@ -29,12 +31,8 @@ class ObjectMQTT(Thread):
     def run(self):
         def on_connect(client, userdata, flags, rc):
             print("Connected with Object code " + str(rc))
+            client.subscribe("object_detection")
 
-            # Subscribing in on_connect() means that if we lose the connection and
-            # reconnect then subscriptions will be renewed.
-            client.subscribe("object_detection")  # Topic /seoul/yuokok을 구독한다.
-
-        # The callback for when a PUBLISH message is received from the server.
         def on_message(client, userdata, msg):
             global HighResolution, Objectstate
             x = str(msg.payload.decode('utf-8'))
@@ -51,12 +49,8 @@ class ObjectMQTT(Thread):
         client.on_connect = on_connect
         client.on_message = on_message
 
-        client.connect("192.168.0.17")  # - 서버 IP '테스트를 위해 test.mosquitto.org'로 지정
+        client.connect("192.168.0.17")
 
-        # Blocking call that processes network traffic, dispatches callbacks and
-        # handles reconnecting.
-        # Other loop*() functions are available that give a threaded interface and a
-        # manual interface.
         client.loop_forever()
 
 
@@ -68,11 +62,8 @@ class FaceMQTT(Thread):
         def on_connect(client, userdata, flags, rc):
             print("Connected with Face " + str(rc))
 
-            # Subscribing in on_connect() means that if we lose the connection and
-            # reconnect then subscriptions will be renewed.
-            client.subscribe("face_recognition")  # Topic /seoul/yuokok을 구독한다.
+            client.subscribe("face_recognition")
 
-        # The callback for when a PUBLISH message is received from the server.
         def on_message(client, userdata, msg):
             global HighResolution, Facestate
             x = str(msg.payload.decode('utf-8'))
@@ -89,12 +80,8 @@ class FaceMQTT(Thread):
         client.on_connect = on_connect
         client.on_message = on_message
 
-        client.connect("192.168.0.17")  # - 서버 IP '테스트를 위해 test.mosquitto.org'로 지정
+        client.connect("192.168.0.17")
 
-        # Blocking call that processes network traffic, dispatches callbacks and
-        # handles reconnecting.
-        # Other loop*() functions are available that give a threaded interface and a
-        # manual interface.
         client.loop_forever()
 
 
@@ -106,11 +93,9 @@ class QrMQTT(Thread):
         def on_connect(client, userdata, flags, rc):
             print("Connected with QR " + str(rc))
 
-            # Subscribing in on_connect() means that if we lose the connection and
-            # reconnect then subscriptions will be renewed.
-            client.subscribe("qr_code")  # Topic /seoul/yuokok을 구독한다.
+            client.subscribe("qr_code")
 
-        # The callback for when a PUBLISH message is received from the server.
+
         def on_message(client, userdata, msg):
             global HighResolution, QRstate
             x = str(msg.payload.decode('utf-8'))
@@ -127,14 +112,71 @@ class QrMQTT(Thread):
         client.on_connect = on_connect
         client.on_message = on_message
 
-        client.connect("192.168.0.17")  # - 서버 IP '테스트를 위해 test.mosquitto.org'로 지정
+        client.connect("192.168.0.17")
 
-        # Blocking call that processes network traffic, dispatches callbacks and
-        # handles reconnecting.
-        # Other loop*() functions are available that give a threaded interface and a
-        # manual interface.
         client.loop_forever()
 
+
+class FaceMQTT2(Thread):
+    def __index__(self):
+        Thread.__init__(self)
+
+    def run(self):
+        def on_connect(client, userdata, flags, rc):
+            print("Connected with Face2 " + str(rc))
+
+            client.subscribe("face_recognition2")
+
+        def on_message(client, userdata, msg):
+            global HighResolution, Facestate2
+            x = str(msg.payload.decode('utf-8'))
+            if x == 'change_low_res' and Facestate2:
+                HighResolution.remove("face_recognition2")
+                Facestate2 = False
+                print(x)
+            elif x == 'change_high_res' and not Facestate2:
+                HighResolution.append("face_recognition2")
+                Facestate2 = True
+                print(x)
+
+        client = mqtt.Client()
+        client.on_connect = on_connect
+        client.on_message = on_message
+
+        client.connect("192.168.0.17")
+
+        client.loop_forever()
+
+
+class QrMQTT2(Thread):
+    def __index__(self):
+        Thread.__init__(self)
+
+    def run(self):
+        def on_connect(client, userdata, flags, rc):
+            print("Connected with QR2 " + str(rc))
+
+            client.subscribe("qr_code2")
+
+        def on_message(client, userdata, msg):
+            global HighResolution, QRstate2
+            x = str(msg.payload.decode('utf-8'))
+            if x == 'change_low_res' and QRstate2:
+                HighResolution.remove("qr_code2")
+                QRstate2 = False
+                print(x)
+            elif x == 'change_high_res' and not QRstate2:
+                HighResolution.append("qr_code2")
+                QRstate2 = True
+                print(x)
+
+        client = mqtt.Client()
+        client.on_connect = on_connect
+        client.on_message = on_message
+
+        client.connect("192.168.0.17")
+
+        client.loop_forever()
 
 class Control(Thread):
     def __init__(self):
@@ -208,6 +250,26 @@ class Control(Thread):
                     ]
                 print("up Channel Final: " + "qr_code")
                 publish.multiple(msgs, hostname="192.168.0.17")
+            elif channel_down and Facestate2:
+                msgs = \
+                    [
+                        {
+                            'topic': "face_recognition2",
+                            'payload': "up"
+                        }
+                    ]
+                print("up Channel Final: " + "face_recognition2")
+                publish.multiple(msgs, hostname="192.168.0.17")
+            elif channel_down and QRstate2:
+                msgs = \
+                    [
+                        {
+                            'topic': "qr_code2",
+                            'payload': "up"
+                        }
+                    ]
+                print("up Channel Final: " + "qr_code2")
+                publish.multiple(msgs, hostname="192.168.0.17")
             print("Thread explode")
             threadstate = False
 
@@ -248,15 +310,22 @@ if __name__ == "__main__":
     Object = ObjectMQTT()
     Face = FaceMQTT()
     Qr = QrMQTT()
+    Face2 = FaceMQTT2()
+    Qr2 = QrMQTT2()
     Object.start()
     Face.start()
     Qr.start()
+    Face2.start()
+    Qr2.start()
     while True:
         try:
             UB = update_bandwidth.UpdateBandwidth()
             UB.update_page()
             in_bw, stream_meta = UB.get_data()
-            total = in_bw[0]
+            if "kilo" in in_bw[1]:
+                total = in_bw[0]
+            elif "mega" in in_bw[1]:
+                total = in_bw[0] * 2**10
             if total_prev != total:
                 print("current In Bandwidth : " + str(total))
 
