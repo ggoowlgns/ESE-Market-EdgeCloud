@@ -53,7 +53,7 @@ if __name__ == "__main__":
             total = in_bw[0]
             print("current In Bandwidth : " + str(total))
 
-            #사람 동작하다가 빠질때
+            #사람 동작하다가 빠질때 아무거나 하나라도 빠지면 -> HighResolution 에서 제거 -> IndexError 유도
             for camera in stream_meta.keys():
                 if stream_meta[camera][0] == '160':
                     if priority[camera] in HighResolution:
@@ -75,7 +75,7 @@ if __name__ == "__main__":
                 for x in priority.keys():
                     if x in HighResolution:
                         templist.append(x)
-                for y in len(templist):
+                for y in range(len(templist)):
                     HighResolution[y] = templist[y]
                 Maxcount = len(HighResolution)
                 threadstate = True
