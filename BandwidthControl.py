@@ -70,7 +70,7 @@ if __name__ == "__main__":
                     HighResolution.append(camera)
 
             #total 값이 넘어갈때 제어 -> Thread로 들어감
-            if MaxBandwidth < total and not threadstate:
+            if ((MaxBandwidth < total) and (not threadstate)):
                 templist = []
                 for x in priority.keys():
                     if x in HighResolution:
