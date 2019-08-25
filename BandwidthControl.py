@@ -91,7 +91,7 @@ if __name__ == "__main__":
             #사람 동작하다가 빠질때 아무거나 하나라도 빠지면 -> HighResolution 에서 제거 -> IndexError 유도
             for camera in stream_meta.keys():
                 if stream_meta[camera][0] == '160':
-                    if priority[camera] in HighResolution:
+                    if camera in HighResolution:
                         msgs = \
                             [
                                 {
