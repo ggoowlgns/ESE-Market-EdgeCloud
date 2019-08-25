@@ -27,6 +27,7 @@ def controll_fps_thread():
                     'payload': "down"
                 }
             ]
+            print("down Channel : " + HighResolution[index])
             publish.multiple(msgs, hostname="61.253.199.32")
             time.sleep(3)
             msgs = \
@@ -48,6 +49,9 @@ if __name__ == "__main__":
             UB.update_page()
             in_bw, stream_meta = UB.get_data()
             total = in_bw[0]
+            print("current In Bandwidth : " + total)
+
+            #사람 동작하다가 빠질때
             for camera in stream_meta.keys():
                 if stream_meta[camera][0] == '160':
                     if priority[camera] in HighResolution:
@@ -62,6 +66,8 @@ if __name__ == "__main__":
                         HighResolution.remove(camera)
                 else:
                     HighResolution.append(camera)
+
+            #total 값이 넘어갈때 제어 -> Thread로 들어감
             if MaxBandwidth < total and not threadstate:
                 templist = []
                 for x in priority.keys():
