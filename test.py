@@ -4,6 +4,7 @@ import time
 import update_bandwidth
 import urllib.request
 total = 0
+total_prev = 0
 
 if __name__ == "__main__":
     UB = update_bandwidth.UpdateBandwidth()
@@ -16,8 +17,11 @@ if __name__ == "__main__":
                 total = in_bw[0]
             elif "mega" in in_bw[1]:
                 total = in_bw[0] * 2**10
-            f.write(str(total))
-            f.write("\n")
+            if total_prev != total:
+                print("current In Bandwidth : " + str(total))
+                f.write(str(total))
+                f.write("\n")
+                total_prev = total
             time.sleep(0.1)
         except AttributeError:
             print("로딩중 입니다.")
