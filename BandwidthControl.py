@@ -5,6 +5,8 @@ import paho.mqtt.publish as publish
 import urllib.request
 import paho.mqtt.client as mqtt
 
+
+
 priority = {"face_recognition": 3, "object_detection": 2, "qr_code": 1, "face_recognition2" : 4, "qr_code2" : 5}
 HighResolution = []  # 요구 해상도로 올려져 있을 경우 해당 카메라가 추가되는 리스트
 Maxcount = 0
@@ -317,6 +319,7 @@ if __name__ == "__main__":
     Qr.start()
     Face2.start()
     Qr2.start()
+    f = open("nosol.txt", "w")
     while True:
         try:
             UB = update_bandwidth.UpdateBandwidth()
@@ -328,6 +331,8 @@ if __name__ == "__main__":
                 total = in_bw[0] * 2**10
             if total_prev != total:
                 print("current In Bandwidth : " + str(total))
+                f.write(str(total))
+                f.write("\n")
 
                 # #사람 동작하다가 빠질때 아무거나 하나라도 빠지면 -> HighResolution 에서 제거 -> IndexError 유도
                 # for camera in stream_meta.keys():
@@ -375,6 +380,9 @@ if __name__ == "__main__":
             if not error_occured:
                 print("연결이 끊겼습니다. 잠시만 기다려주세요22")
             error_occured = True
+        except KeyboardInterrupt:
+            f.close()
+            print("사용 종료")
 # 수용 대역폭이 한정 대역폭을 초과 하였을때
 
 
