@@ -14,7 +14,7 @@ threadstate = False
 
 class Control(Thread):
     def __init__(self):
-        pass
+        Thread.__init__(self)
     def run(self):
         global threadstate, Maxcount, MaxBandwidth
         index = 0
