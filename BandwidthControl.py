@@ -12,6 +12,10 @@ MaxBandwidth = 100
 total = 0
 threadstate = False
 
+total_prev = 0
+error_occured = False
+
+
 class Control(Thread):
     def __init__(self):
         Thread.__init__(self)
@@ -86,7 +90,8 @@ if __name__ == "__main__":
             UB.update_page()
             in_bw, stream_meta = UB.get_data()
             total = in_bw[0]
-            print("current In Bandwidth : " + str(total))
+            if total_prev != total:
+                print("current In Bandwidth : " + str(total))
 
             #사람 동작하다가 빠질때 아무거나 하나라도 빠지면 -> HighResolution 에서 제거 -> IndexError 유도
             for camera in stream_meta.keys():
@@ -116,13 +121,23 @@ if __name__ == "__main__":
                 threadstate = True
                 t1 = Control()
                 t1.start()
+
+            total_prev = total
+            error_occured = False
+
             time.sleep(0.1)
         except AttributeError:
-            print("Loading 중 입니다.")
+            if not error_occured:
+                print("Loading 중 입니다.")
+            error_occured = True
         except TimeoutError:
-            print("연결이 끊겼습니다. 잠시만 기다려주세요")
+            if not error_occured:
+                print("연결이 끊겼습니다. 잠시만 기다려주세요")
+            error_occured = True
         except urllib.error.URLError:
-            print("연결이 끊겼습니다. 잠시만 기다려주세요22")
+            if not error_occured:
+                print("연결이 끊겼습니다. 잠시만 기다려주세요22")
+            error_occured = True
 # 수용 대역폭이 한정 대역폭을 초과 하였을때
 
 
