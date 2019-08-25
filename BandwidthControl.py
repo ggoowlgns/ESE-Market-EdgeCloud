@@ -39,6 +39,8 @@ def controll_fps_thread():
                 ]
             publish.multiple(msgs, hostname="61.253.199.32")
             index += 1
+
+            time.sleep(0.1)
         except IndexError:
             threadstate = False
 
@@ -49,7 +51,7 @@ if __name__ == "__main__":
             UB.update_page()
             in_bw, stream_meta = UB.get_data()
             total = in_bw[0]
-            print("current In Bandwidth : " + total)
+            print("current In Bandwidth : " + str(total))
 
             #사람 동작하다가 빠질때
             for camera in stream_meta.keys():
@@ -79,6 +81,7 @@ if __name__ == "__main__":
                 threadstate = True
                 t1 = Thread(target=controll_fps_thread())
                 t1.start()
+            time.sleep(0.1)
         except AttributeError:
             print("Loading 중 입니다.")
         except TimeoutError:
