@@ -21,40 +21,42 @@ class Control(Thread):
     def __init__(self):
         Thread.__init__(self)
     def run(self):
-        global threadstate, Maxcount, MaxBandwidth
+        global threadstate, Maxcount, MaxBandwidth,total_prev,total
         index = 0
         temp_channel = ""
         try:
-            while threadstate:
+            while threadstate and (total_prev != total):
                 if index == Maxcount:
                     index = 0
 
-                temp_channel = HighResolution[index]
-                msgs = \
-                    [
-                        {
-                            'topic': HighResolution[index],
-                            'payload': "down"
-                        }
-                    ]
-                print("down Channel : " + HighResolution[index])
-                publish.multiple(msgs, hostname="192.168.0.17")
-                channel_down = True
+
+                if temp_channel in HighResolution:
+                    temp_channel = HighResolution[index]
+                    msgs = \
+                        [
+                            {
+                                'topic': HighResolution[index],
+                                'payload': "down"
+                            }
+                        ]
+                    print("down Channel : " + HighResolution[index])
+                    publish.multiple(msgs, hostname="192.168.0.17")
+                    channel_down = True
 
                 time.sleep(3)
 
-
-                msgs = \
-                    [
-                        {
-                            'topic': HighResolution[index],
-                            'payload': "up"
-                        }
-                    ]
-                print("up Channel : " + HighResolution[index])
-                publish.multiple(msgs, hostname="192.168.0.17")
-                channel_down = False
-                index += 1
+                if temp_channel in HighResolution:
+                    msgs = \
+                        [
+                            {
+                                'topic': HighResolution[index],
+                                'payload': "up"
+                            }
+                        ]
+                    print("up Channel : " + HighResolution[index])
+                    publish.multiple(msgs, hostname="192.168.0.17")
+                    channel_down = False
+                    index += 1
 
                 time.sleep(0.1)
         except IndexError:
@@ -106,6 +108,7 @@ class Control(Thread):
 #             threadstate = False
 
 if __name__ == "__main__":
+    global total, total_prev
     while True:
         try:
             UB = update_bandwidth.UpdateBandwidth()
@@ -129,7 +132,7 @@ if __name__ == "__main__":
                             # publish.multiple(msgs, hostname="192.168.0.17")
                             HighResolution.remove(camera)
                             threadstate = False
-                    else:
+                    elif camera not in HighResolution:
                         HighResolution.append(camera)
 
                 #total 값이 넘어갈때 제어 -> Thread로 들어감
