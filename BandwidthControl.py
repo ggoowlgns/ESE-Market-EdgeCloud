@@ -35,7 +35,10 @@ class Control(Thread):
                     ]
                 print("down Channel : " + HighResolution[index])
                 publish.multiple(msgs, hostname="192.168.0.17")
+
                 time.sleep(3)
+
+
                 msgs = \
                     [
                         {
@@ -43,7 +46,9 @@ class Control(Thread):
                             'payload': "up"
                         }
                     ]
+                print("up Channel : " + HighResolution[index])
                 publish.multiple(msgs, hostname="192.168.0.17")
+
                 index += 1
 
                 time.sleep(0.1)
@@ -93,37 +98,37 @@ if __name__ == "__main__":
             if total_prev != total:
                 print("current In Bandwidth : " + str(total))
 
-            #사람 동작하다가 빠질때 아무거나 하나라도 빠지면 -> HighResolution 에서 제거 -> IndexError 유도
-            for camera in stream_meta.keys():
-                if stream_meta[camera][0] == '160':
-                    if camera in HighResolution:
-                        msgs = \
-                            [
-                                {
-                                    'topic': camera,
-                                    'payload': "reset"
-                                }
-                            ]
-                        publish.multiple(msgs, hostname="192.168.0.17")
-                        HighResolution.remove(camera)
-                else:
-                    HighResolution.append(camera)
+                #사람 동작하다가 빠질때 아무거나 하나라도 빠지면 -> HighResolution 에서 제거 -> IndexError 유도
+                for camera in stream_meta.keys():
+                    if stream_meta[camera][0] == '160':
+                        if camera in HighResolution:
+                            msgs = \
+                                [
+                                    {
+                                        'topic': camera,
+                                        'payload': "reset"
+                                    }
+                                ]
+                            publish.multiple(msgs, hostname="192.168.0.17")
+                            HighResolution.remove(camera)
+                    else:
+                        HighResolution.append(camera)
 
-            #total 값이 넘어갈때 제어 -> Thread로 들어감
-            if ((MaxBandwidth < total) and (not threadstate)):
-                templist = []
-                for x in priority.keys():
-                    if x in HighResolution:
-                        templist.append(x)
-                for y in range(len(templist)):
-                    HighResolution[y] = templist[y]
-                Maxcount = len(HighResolution)
-                threadstate = True
-                t1 = Control()
-                t1.start()
+                #total 값이 넘어갈때 제어 -> Thread로 들어감
+                if ((MaxBandwidth < total) and (not threadstate)):
+                    templist = []
+                    for x in priority.keys():
+                        if x in HighResolution:
+                            templist.append(x)
+                    for y in range(len(templist)):
+                        HighResolution[y] = templist[y]
+                    Maxcount = len(HighResolution)
+                    threadstate = True
+                    t1 = Control()
+                    t1.start()
 
-            total_prev = total
-            error_occured = False
+                total_prev = total
+                error_occured = False
 
             time.sleep(0.1)
         except AttributeError:
