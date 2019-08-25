@@ -15,6 +15,7 @@ threadstate = False
 total_prev = 0
 error_occured = False
 
+channel_down = False
 
 class Control(Thread):
     def __init__(self):
@@ -22,10 +23,13 @@ class Control(Thread):
     def run(self):
         global threadstate, Maxcount, MaxBandwidth
         index = 0
+        temp_channel = ""
         try:
             while threadstate:
                 if index == Maxcount:
                     index = 0
+
+                temp_channel = HighResolution[index]
                 msgs = \
                     [
                         {
@@ -35,6 +39,7 @@ class Control(Thread):
                     ]
                 print("down Channel : " + HighResolution[index])
                 publish.multiple(msgs, hostname="192.168.0.17")
+                channel_down = True
 
                 time.sleep(3)
 
@@ -48,11 +53,23 @@ class Control(Thread):
                     ]
                 print("up Channel : " + HighResolution[index])
                 publish.multiple(msgs, hostname="192.168.0.17")
-
+                channel_down = False
                 index += 1
 
                 time.sleep(0.1)
         except IndexError:
+            if channel_down:
+                msgs = \
+                    [
+                        {
+                            'topic': temp_channel,
+                            'payload': "up"
+                        }
+                    ]
+                print("up Channel : " + temp_channel)
+                publish.multiple(msgs, hostname="192.168.0.17")
+
+            print("Thread explode")
             threadstate = False
 
 
@@ -102,15 +119,16 @@ if __name__ == "__main__":
                 for camera in stream_meta.keys():
                     if stream_meta[camera][0] == '160':
                         if camera in HighResolution:
-                            msgs = \
-                                [
-                                    {
-                                        'topic': camera,
-                                        'payload': "reset"
-                                    }
-                                ]
-                            publish.multiple(msgs, hostname="192.168.0.17")
+                            # msgs = \
+                            #     [
+                            #         {
+                            #             'topic': camera,
+                            #             'payload': "reset"
+                            #         }
+                            #     ]
+                            # publish.multiple(msgs, hostname="192.168.0.17")
                             HighResolution.remove(camera)
+                            threadstate = False
                     else:
                         HighResolution.append(camera)
 
