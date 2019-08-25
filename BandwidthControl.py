@@ -141,7 +141,7 @@ class Control(Thread):
         Thread.__init__(self)
 
     def run(self):
-        global threadstate, Maxcount, MaxBandwidth, total_prev, total
+        global threadstate, Maxcount, MaxBandwidth, total_prev, total, Objectstate, Facestate, QRstate
         index = 0
         temp_channel = ""
         try:
@@ -150,7 +150,6 @@ class Control(Thread):
                     index = 0
                 temp_channel = HighResolution[index]
                 if temp_channel in HighResolution:
-                    temp_channel = HighResolution[index]
                     msgs = \
                         [
                             {
@@ -179,17 +178,36 @@ class Control(Thread):
 
                 time.sleep(0.1)
         except IndexError:
-            if channel_down:
+            if channel_down and Objectstate:
                 msgs = \
                     [
                         {
-                            'topic': temp_channel,
+                            'topic': "object_detection",
                             'payload': "up"
                         }
                     ]
-                print("up Channel Final: " + temp_channel)
+                print("up Channel Final: " + "object_detection")
                 publish.multiple(msgs, hostname="192.168.0.17")
-
+            elif channel_down and Facestate:
+                msgs = \
+                    [
+                        {
+                            'topic': "face_recognition",
+                            'payload': "up"
+                        }
+                    ]
+                print("up Channel Final: " + "face_recognition")
+                publish.multiple(msgs, hostname="192.168.0.17")
+            elif channel_down and QRstate:
+                msgs = \
+                    [
+                        {
+                            'topic': "qr_code",
+                            'payload': "up"
+                        }
+                    ]
+                print("up Channel Final: " + "qr_code")
+                publish.multiple(msgs, hostname="192.168.0.17")
             print("Thread explode")
             threadstate = False
 
