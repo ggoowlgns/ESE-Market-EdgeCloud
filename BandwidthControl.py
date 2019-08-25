@@ -1,3 +1,4 @@
+import sys
 from threading import Thread
 import time
 import update_bandwidth
@@ -383,6 +384,7 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             f.close()
             print("사용 종료")
+            sys.exit()
 # 수용 대역폭이 한정 대역폭을 초과 하였을때
 
 
