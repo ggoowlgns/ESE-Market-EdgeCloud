@@ -12,37 +12,72 @@ MaxBandwidth = 100
 total = 0
 threadstate = False
 
-# fps를 낮춰주는 스레드
-def controll_fps_thread():
-    global threadstate, Maxcount, MaxBandwidth
-    index = 0
-    while threadstate:
+class Control(Thread):
+    def __init__(self):
+        pass
+    def run(self):
+        global threadstate, Maxcount, MaxBandwidth
+        index = 0
         try:
-            if index == Maxcount:
-                index = 0
-            msgs = \
-            [
-                {
-                    'topic': HighResolution[index],
-                    'payload': "down"
-                }
-            ]
-            print("down Channel : " + HighResolution[index])
-            publish.multiple(msgs, hostname="61.253.199.32")
-            time.sleep(3)
-            msgs = \
-                [
-                    {
-                        'topic': HighResolution[index],
-                        'payload': "up"
-                    }
-                ]
-            publish.multiple(msgs, hostname="61.253.199.32")
-            index += 1
+            while threadstate:
+                if index == Maxcount:
+                    index = 0
+                msgs = \
+                    [
+                        {
+                            'topic': HighResolution[index],
+                            'payload': "down"
+                        }
+                    ]
+                print("down Channel : " + HighResolution[index])
+                publish.multiple(msgs, hostname="61.253.199.32")
+                time.sleep(3)
+                msgs = \
+                    [
+                        {
+                            'topic': HighResolution[index],
+                            'payload': "up"
+                        }
+                    ]
+                publish.multiple(msgs, hostname="61.253.199.32")
+                index += 1
 
-            time.sleep(0.1)
+                time.sleep(0.1)
         except IndexError:
             threadstate = False
+
+
+# fps를 낮춰주는 스레드
+# def controll_fps_thread():
+#     global threadstate, Maxcount, MaxBandwidth
+#     index = 0
+#     while threadstate:
+#         try:
+#             if index == Maxcount:
+#                 index = 0
+#             msgs = \
+#             [
+#                 {
+#                     'topic': HighResolution[index],
+#                     'payload': "down"
+#                 }
+#             ]
+#             print("down Channel : " + HighResolution[index])
+#             publish.multiple(msgs, hostname="61.253.199.32")
+#             time.sleep(3)
+#             msgs = \
+#                 [
+#                     {
+#                         'topic': HighResolution[index],
+#                         'payload': "up"
+#                     }
+#                 ]
+#             publish.multiple(msgs, hostname="61.253.199.32")
+#             index += 1
+#
+#             time.sleep(0.1)
+#         except IndexError:
+#             threadstate = False
 
 if __name__ == "__main__":
     while True:
@@ -79,7 +114,7 @@ if __name__ == "__main__":
                     HighResolution[y] = templist[y]
                 Maxcount = len(HighResolution)
                 threadstate = True
-                t1 = Thread(target=controll_fps_thread())
+                t1 = Control()
                 t1.start()
             time.sleep(0.1)
         except AttributeError:
