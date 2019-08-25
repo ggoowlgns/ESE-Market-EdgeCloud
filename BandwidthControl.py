@@ -30,7 +30,7 @@ class Control(Thread):
                         }
                     ]
                 print("down Channel : " + HighResolution[index])
-                publish.multiple(msgs, hostname="61.253.199.32")
+                publish.multiple(msgs, hostname="192.168.0.17")
                 time.sleep(3)
                 msgs = \
                     [
@@ -39,7 +39,7 @@ class Control(Thread):
                             'payload': "up"
                         }
                     ]
-                publish.multiple(msgs, hostname="61.253.199.32")
+                publish.multiple(msgs, hostname="192.168.0.17")
                 index += 1
 
                 time.sleep(0.1)
@@ -63,7 +63,7 @@ class Control(Thread):
 #                 }
 #             ]
 #             print("down Channel : " + HighResolution[index])
-#             publish.multiple(msgs, hostname="61.253.199.32")
+#             publish.multiple(msgs, hostname="192.168.0.17")
 #             time.sleep(3)
 #             msgs = \
 #                 [
@@ -72,7 +72,7 @@ class Control(Thread):
 #                         'payload': "up"
 #                     }
 #                 ]
-#             publish.multiple(msgs, hostname="61.253.199.32")
+#             publish.multiple(msgs, hostname="192.168.0.17")
 #             index += 1
 #
 #             time.sleep(0.1)
@@ -99,7 +99,7 @@ if __name__ == "__main__":
                                     'payload': "reset"
                                 }
                             ]
-                        publish.multiple(msgs, hostname="61.253.199.32")
+                        publish.multiple(msgs, hostname="192.168.0.17")
                         HighResolution.remove(camera)
                 else:
                     HighResolution.append(camera)

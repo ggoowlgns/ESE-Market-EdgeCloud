@@ -20,7 +20,7 @@ class UpdateBandwidth:
         return size/8, power_labels[n]+'bytes'
 
     def update_page(self):
-        webPage_xml = urllib.request.urlopen("http://61.253.199.32:81/stat.xml")
+        webPage_xml = urllib.request.urlopen("http://192.168.0.17:81/stat.xml")
         webPage_xml = webPage_xml.read().decode("utf-8")
 
         # print(webPage_xml)
